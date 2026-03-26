@@ -1,115 +1,110 @@
 # LLM Physical Reasoning Evaluator
 
-Benchmarks LLM performance on physical reasoning questions and generates an interactive HTML report.
+Benchmarks large language models on physical reasoning across 8 categories using an LLM-as-judge scoring rubric.
 
-Inspired by the [NEWTON](https://arxiv.org/abs/2310.07445) physical intuition benchmark paper.
+[Live results dashboard](https://aaryavseth.github.io/LLMPhysicalReasoningEvaluator/)
 
 ---
 
-## How it works
+## Motivation
 
-40 questions across 8 categories test whether a model can reason about the physical world:
+Physical reasoning requires a model to simulate how the world behaves rather than recall facts. This makes it one of the harder failure modes for LLMs, and a critical one for robotics, where models must anticipate how objects move and interact before acting. The [NEWTON benchmark](https://arxiv.org/abs/2310.07445) (Wang et al., 2023) showed that even strong LLMs fail surprisingly often on intuitive physics questions. This project builds a focused, runnable version of that idea.
 
-- Gravity & Projectiles
-- Collisions & Momentum
-- Fluid Dynamics
-- Levers & Torque
-- Thermal Expansion
-- Center of Mass
-- Friction & Inclines
-- Buoyancy
+---
 
-Each question is sent to the target model via the Groq API. A second Groq call uses `llama3-8b-8192` as an LLM judge to score the response on a 0–3 rubric:
+## Benchmark design
+
+### Categories
+
+| Category | Description |
+|---|---|
+| Gravity & Projectiles | Freefall, horizontal throws, parabolic motion |
+| Buoyancy | Archimedes' principle, floating and sinking |
+| Friction & Inclines | Static vs kinetic friction, inclined planes |
+| Fluid Dynamics | Flow rate, pressure, Bernoulli's principle |
+| Collisions & Momentum | Conservation of momentum, elastic and inelastic collisions |
+| Center of Mass | Balance, stability, distributed mass |
+| Levers & Torque | Mechanical advantage, rotational equilibrium |
+| Thermal Expansion | Volume and length changes with temperature |
+
+### Difficulty
+
+Each question is tagged easy, medium, or hard based on the number of reasoning steps required and whether the answer is counterintuitive.
+
+### Scoring rubric
 
 | Score | Meaning |
-|-------|---------|
-| 0 | Wrong or completely irrelevant |
-| 1 | Partially correct, missing the key physical insight |
-| 2 | Correct but explanation is weak or incomplete |
-| 3 | Fully correct with clear physical reasoning |
+|---|---|
+| 3 | Correct answer with sound physical reasoning |
+| 2 | Correct answer but incomplete or shallow explanation |
+| 1 | Partially correct, right direction but wrong details |
+| 0 | Incorrect or fundamentally flawed reasoning |
 
-Results are saved as JSON and rendered as a self-contained HTML dashboard with per-category and per-difficulty breakdowns.
+---
 
-Groq is used throughout for fast, free inference.
+## Results: llama-3.3-70b-versatile
+
+| Metric | Value |
+|---|---|
+| Overall accuracy | 63.3% |
+| Avg judge score | 1.90 / 3.00 |
+| Best category | Thermal Expansion (80%) |
+| Worst category | Buoyancy (46.7%) |
+
+The model performs well on rule-based categories like Thermal Expansion and Friction but struggles with Buoyancy, which requires counterintuitive reasoning about displaced volume rather than object weight. This is consistent with NEWTON's finding that LLMs tend to apply surface-level heuristics rather than simulate physical principles.
 
 ---
 
 ## Quick start
-
-**1. Clone and install**
-
 ```bash
-git clone https://github.com/yourname/llm-physical-reasoning-evaluator
-cd llm-physical-reasoning-evaluator
+git clone https://github.com/aaryavseth/LLMPhysicalReasoningEvaluator
+cd LLMPhysicalReasoningEvaluator
 pip install -r requirements.txt
 ```
 
-**2. Export your Groq API key**
-
+Set your Groq API key (free tier works):
 ```bash
 export GROQ_API_KEY=your_key_here
 ```
 
-Get a free key at [console.groq.com](https://console.groq.com).
-
-**3. Run the full benchmark**
-
+Run the full benchmark:
 ```bash
-python main.py full
+python main.py full --model llama-3.3-70b-versatile
 ```
 
-This runs all 40 questions, scores them, and opens the dashboard in your browser.
+Results are saved to `results/` and the dashboard opens automatically in your browser.
 
 ---
 
-## CLI
-
+## Project structure
 ```
-python main.py run        Run questions against a model, save raw responses
-python main.py score      Score a saved run file with the LLM judge
-python main.py visualize  Generate the HTML dashboard from a scored run
-python main.py full       Run all three steps in sequence
-```
-
-**Options**
-
-```
-run / full:
-  --model      Model to evaluate (default: llama-3.3-70b-versatile)
-  --category   Restrict to one category (default: all)
-
-score:
-  --results    Path to results/run_*.json
-
-visualize:
-  --results    Path to results/scored_run_*.json
-```
-
-**Examples**
-
-```bash
-# Evaluate a specific category
-python main.py run --model llama-3.3-70b-versatile --category "Fluid Dynamics"
-
-# Score an existing run
-python main.py score --results results/run_20250325_120000.json
-
-# Regenerate the dashboard without re-running
-python main.py visualize --results results/scored_run_20250325_120000.json
+LLMPhysicalReasoningEvaluator/
+├── benchmark/        # 40 questions across 8 categories
+├── evaluator/        # Runner and LLM judge scorer
+├── visualizer/       # Dashboard generator
+├── results/          # JSON output from each run
+├── docs/             # GitHub Pages dashboard
+│   └── index.html
+├── main.py           # CLI entrypoint
+└── README.md
 ```
 
 ---
 
-## Extending
+## Limitations
 
-- **Add questions** — edit `benchmark/questions.json`. Each entry needs `id`, `category`, `question`, `correct_answer`, `difficulty`, and `explanation`. The runner picks up all questions automatically.
-
-- **Swap models** — pass any model ID supported by Groq via `--model`. The judge model is hardcoded to `llama3-8b-8192` in `evaluator/scorer.py`; change `JUDGE_MODEL` there to use a different one.
-
-- **Add categories** — add questions with a new `category` string. No other changes needed; the dashboard groups by category dynamically.
+- Question set is a pilot of 40 questions. A larger peer-validated set is the obvious next step.
+- Only one model evaluated so far. Multi-model comparison is planned.
+- The judge model introduces its own biases. Prompt sensitivity analysis has not been conducted.
 
 ---
 
-## Why this exists
+## References
 
-Physical reasoning is a documented weak spot for LLMs. Models trained on text learn to pattern-match physics terminology without developing reliable intuitions about how objects actually behave — a gap that becomes critical in robotics and embodied AI, where a planning model needs to predict the real-world consequences of actions before they are executed. Standard benchmarks focus on mathematical problem-solving; this one focuses on conceptual understanding of the kind a robot needs when reasoning about manipulation, locomotion, or tool use.
+Wang et al. (2023). NEWTON: Are Large Language Models Capable of Physical Reasoning? EMNLP 2023. https://arxiv.org/abs/2310.07445
+
+---
+
+## License
+
+MIT
