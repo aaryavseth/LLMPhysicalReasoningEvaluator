@@ -1,8 +1,4 @@
 .env
-.agents/
-.claude/
 __pycache__/
 *.pyc
 results/*.json
-CLAUDE.md
-skills-lock.json
