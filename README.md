@@ -8,7 +8,7 @@ Benchmarks large language models on physical reasoning across 8 categories using
 
 ## Motivation
 
-Physical reasoning requires a model to simulate how the world behaves rather than recall facts. This makes it one of the harder failure modes for LLMs, and a critical one for robotics, where models must anticipate how objects move and interact before acting. The [NEWTON benchmark](https://arxiv.org/abs/2310.07445) (Wang et al., 2023) showed that even strong LLMs fail surprisingly often on intuitive physics questions. This project builds a focused, runnable version of that idea.
+Physical reasoning requires a model to simulate how the world behaves rather than recall facts. This makes it one of the harder failure modes for LLMs, and a critical one for robotics, where models must anticipate how objects move and interact before acting. The [NEWTON benchmark](https://arxiv.org/abs/2310.07018) (Wang et al., 2023) showed that even strong LLMs fail surprisingly often on intuitive physics questions. This project builds a focused, runnable version of that idea.
 
 ---
 
