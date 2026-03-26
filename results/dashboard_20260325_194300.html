@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Benchmark Results</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f8f7f4;
+      --surface: #ffffff;
+      --border: #e8e5e0;
+      --border-subtle: #f0ede8;
+      --text-primary: #1c1917;
+      --text-secondary: #6b6460;
+      --text-muted: #a8a29e;
+      --topbar-bg: #ffffff;
+      --topbar-border: #e8e5e0;
+      --topbar-text: #1c1917;
+      --topbar-muted: #a8a29e;
+      --row-alt: #faf9f7;
+      --row-hover: #f3f1ed;
+      --score-0-bg: #f3f4f6; --score-0-fg: #4b5563;
+      --score-1-bg: #fef3c7; --score-1-fg: #92400e;
+      --score-2-bg: #ccfbf1; --score-2-fg: #0f766e;
+      --score-3-bg: #dcfce7; --score-3-fg: #166534;
+      --diff-easy-bg: #f0fdf4;   --diff-easy-fg: #166534;
+      --diff-medium-bg: #fefce8; --diff-medium-fg: #854d0e;
+      --diff-hard-bg: #fff7ed;   --diff-hard-fg: #9a3412;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      background: var(--bg);
+      color: var(--text-primary);
+    }
+
+    .topbar {
+      background: var(--topbar-bg);
+      border-bottom: 1px solid var(--topbar-border);
+      color: var(--topbar-text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      height: 52px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 20px; }
+    .topbar-title { font-weight: 500; font-size: 14px; color: var(--text-primary); }
+    .topbar-model {
+      font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+      font-size: 12px;
+      color: var(--topbar-muted);
+    }
+    .topbar-right { display: flex; align-items: center; gap: 24px; font-size: 13px; color: var(--topbar-muted); }
+
+    main { max-width: 1280px; margin: 0 auto; padding: 32px 32px 64px; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px 24px 20px;
+    }
+    .card-label {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .card-value {
+      font-size: 28px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+      color: var(--text-primary);
+    }
+    .card-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .val-green { color: #15803d; }
+    .val-amber { color: #b45309; }
+    .val-red   { color: #b91c1c; }
+
+    .charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .chart-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+    }
+    .chart-box h2 {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+    .chart-box canvas { display: block; width: 100% !important; }
+
+    .table-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .table-header h2 {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    .table-hint { font-size: 12px; color: var(--text-muted); }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      background: var(--surface);
+    }
+    th[data-sort] {
+      cursor: pointer;
+      user-select: none;
+    }
+    th[data-sort]:hover { color: var(--text-primary); }
+    th[aria-sort="ascending"]::after  { content: " \2191"; opacity: 1; }
+    th[aria-sort="descending"]::after { content: " \2193"; opacity: 1; }
+    th[data-sort]::after { content: " \2195"; opacity: 0.3; }
+
+    tbody tr { border-bottom: 1px solid var(--border-subtle); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:nth-child(even) { background: var(--row-alt); }
+    tbody tr:hover { background: var(--row-hover); }
+    td { padding: 11px 16px; vertical-align: top; }
+    .td-question { max-width: 320px; color: var(--text-primary); }
+    .td-question-text { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .td-category { color: var(--text-secondary); white-space: nowrap; }
+    .td-score { white-space: nowrap; }
+    .td-reasoning { color: var(--text-secondary); font-size: 12px; line-height: 1.6; max-width: 380px; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 22px;
+      padding: 0 7px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+    .badge-score-0 { background: var(--score-0-bg); color: var(--score-0-fg); }
+    .badge-score-1 { background: var(--score-1-bg); color: var(--score-1-fg); }
+    .badge-score-2 { background: var(--score-2-bg); color: var(--score-2-fg); }
+    .badge-score-3 { background: var(--score-3-bg); color: var(--score-3-fg); }
+
+    .badge-diff {
+      display: inline-flex;
+      align-items: center;
+      height: 20px;
+      padding: 0 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 400;
+    }
+    .badge-diff-easy   { background: var(--diff-easy-bg);   color: var(--diff-easy-fg); }
+    .badge-diff-medium { background: var(--diff-medium-bg); color: var(--diff-medium-fg); }
+    .badge-diff-hard   { background: var(--diff-hard-bg);   color: var(--diff-hard-fg); }
+
+    @media (max-width: 900px) {
+      .cards { grid-template-columns: repeat(2, 1fr); }
+      .charts { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .cards { grid-template-columns: 1fr 1fr; }
+      main { padding: 16px 16px 48px; }
+      .topbar { padding: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="topbar" role="banner">
+  <div class="topbar-left">
+    <span class="topbar-title">Physical Reasoning Benchmark</span>
+    <span class="topbar-model" id="topbarModel"></span>
+  </div>
+  <div class="topbar-right">
+    <span id="topbarTimestamp"></span>
+    <span id="topbarCount"></span>
+  </div>
+</header>
+
+<main>
+  <div class="cards" role="region" aria-label="Summary metrics">
+    <div class="card">
+      <div class="card-label">Overall score</div>
+      <div class="card-value" id="metricOverallPct"></div>
+      <div class="card-sub" id="metricOverallAvg"></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Best category</div>
+      <div class="card-value val-green" id="metricBestPct"></div>
+      <div class="card-sub" id="metricBestName"></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Worst category</div>
+      <div class="card-value val-red" id="metricWorstPct"></div>
+      <div class="card-sub" id="metricWorstName"></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Avg judge score</div>
+      <div class="card-value" id="metricAvgScore"></div>
+      <div class="card-sub">out of 3.00</div>
+    </div>
+  </div>
+
+  <div class="charts" role="region" aria-label="Charts">
+    <div class="chart-box">
+      <h2>Accuracy by category</h2>
+      <canvas id="categoryChart" aria-label="Horizontal bar chart of accuracy percentage per category"></canvas>
+    </div>
+    <div class="chart-box">
+      <h2>Score distribution by difficulty</h2>
+      <canvas id="difficultyChart" aria-label="Stacked bar chart of score distribution by difficulty"></canvas>
+    </div>
+  </div>
+
+  <div class="table-section" role="region" aria-label="Results table">
+    <div class="table-header">
+      <h2>All results</h2>
+      <span class="table-hint">Click column headers to sort</span>
+    </div>
+    <div class="table-wrap">
+      <table id="resultsTable">
+        <thead>
+          <tr>
+            <th scope="col">Question</th>
+            <th scope="col" data-sort="category" aria-sort="none">Category</th>
+            <th scope="col" data-sort="difficulty" aria-sort="none">Difficulty</th>
+            <th scope="col" data-sort="score" aria-sort="none">Score</th>
+            <th scope="col">Judge reasoning</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+  const DATA = {"model": "llama-3.3-70b-versatile", "timestamp": "2026-03-25 19:42:57", "totalQuestions": 5, "overallAvg": 1.6, "overallPct": 53.3, "bestCategory": {"name": "Buoyancy", "pct": 53.3}, "worstCategory": {"name": "Buoyancy", "pct": 53.3}, "categories": [{"name": "Buoyancy", "avg": 1.6, "pct": 53.3, "count": 5}], "difficultyDistribution": [{"label": "Easy", "counts": [0, 0, 1, 1]}, {"label": "Medium", "counts": [0, 0, 1, 0]}, {"label": "Hard", "counts": [1, 1, 0, 0]}], "rows": [{"id": "bu_001", "question": "A ship made of steel floats, but a solid steel ball sinks. Explain how the ship floats despite being made of the same material.", "category": "Buoyancy", "difficulty": "Easy", "score": 3, "reasoning": "The student's response is fully correct, providing a clear and concise explanation of Archimedes' Principle and how the combined density of the ship's steel and the air enclosed within it results in buoyancy. The student also correctly identifies the reason for the steel ball's sinking, making their response well-rounded and physically sound."}, {"id": "bu_002", "question": "A fish bladder (swim bladder) allows fish to remain neutrally buoyant at various depths. However, if a fish is quickly moved to a much greater depth, what happens and why?", "category": "Buoyancy", "difficulty": "Medium", "score": 2, "reasoning": "The student correctly states that the increased water pressure compresses the gas in the swim bladder, reducing its volume and contributing to the fish becoming denser. However, the explanation lacks a direct statement of why the fish becomes denser and tends to sink, which is a crucial point of the physical insight."}, {"id": "bu_003", "question": "You place a sealed empty bottle (air inside) in water and push it fully submerged. Compare the buoyant force when it is 0.5 m deep versus 5 m deep.", "category": "Buoyancy", "difficulty": "Hard", "score": 0, "reasoning": "The student's response is incorrect and misses the key physical insight about the compression of air inside the bottle at greater depths, which affects the volume displaced and thus the buoyant force."}, {"id": "bu_004", "question": "A helium balloon is inside a sealed car. The car accelerates forward. Which direction does the balloon move relative to the car — forward, backward, or does it stay put?", "category": "Buoyancy", "difficulty": "Hard", "score": 1, "reasoning": "The student recognizes the initial behavior of air molecules as the car accelerates and attempts to explain the balloon's movement, but fails to consider the pressure gradient created, which drives the balloon forward. They also attribute the motion to being less dense rather than the difference in air density and pressure inside the car."}, {"id": "bu_005", "question": "A block of wood floats in water with 70% of its volume submerged. What is the wood's density relative to water?", "category": "Buoyancy", "difficulty": "Easy", "score": 2, "reasoning": "The student correctly states that the density of wood is 0.7 times the density of water, but incorrectly calculates the density of the wood as 0.7 g/cm³, instead of stating it as a proportion of water's density, and incorrectly explains the concept of buoyancy in this context."}]};
+
+  Chart.defaults.color = '#6b6460';
+  Chart.defaults.borderColor = 'rgba(0,0,0,0.06)';
+  Chart.defaults.font.family = "system-ui, -apple-system, 'Segoe UI', sans-serif";
+  Chart.defaults.font.size = 12;
+
+  const SCORE_COLORS = ['#9ca3af', '#f59e0b', '#0d9488', '#16a34a'];
+  const SCORE_LABELS = ['Score 0', 'Score 1', 'Score 2', 'Score 3'];
+
+  function pctColor(pct) {
+    if (pct >= 75) return '#16a34a';
+    if (pct >= 50) return '#d97706';
+    return '#dc2626';
+  }
+
+  function pctColorClass(pct) {
+    if (pct >= 75) return 'val-green';
+    if (pct >= 50) return 'val-amber';
+    return 'val-red';
+  }
+
+  function setText(id, text) {
+    document.getElementById(id).textContent = text;
+  }
+
+  setText('topbarModel', DATA.model);
+  setText('topbarTimestamp', DATA.timestamp);
+  setText('topbarCount', DATA.totalQuestions + ' questions');
+
+  const overallEl = document.getElementById('metricOverallPct');
+  overallEl.textContent = DATA.overallPct + '%';
+  overallEl.classList.add(pctColorClass(DATA.overallPct));
+  setText('metricOverallAvg', DATA.overallAvg.toFixed(2) + ' avg score');
+
+  setText('metricBestPct', DATA.bestCategory.pct + '%');
+  setText('metricBestName', DATA.bestCategory.name);
+  setText('metricWorstPct', DATA.worstCategory.pct + '%');
+  setText('metricWorstName', DATA.worstCategory.name);
+
+  const avgEl = document.getElementById('metricAvgScore');
+  avgEl.textContent = DATA.overallAvg.toFixed(2);
+  avgEl.classList.add(pctColorClass(DATA.overallPct));
+
+  const catLabels = DATA.categories.map(c => c.name);
+  const catPcts = DATA.categories.map(c => c.pct);
+  const catColors = catPcts.map(p => pctColor(p));
+
+  new Chart(document.getElementById('categoryChart'), {
+    type: 'bar',
+    data: {
+      labels: catLabels,
+      datasets: [{
+        data: catPcts,
+        backgroundColor: catColors,
+        borderWidth: 0,
+        borderRadius: 3,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ' ' + ctx.parsed.x.toFixed(1) + '%'
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0,
+          max: 100,
+          ticks: { callback: v => v + '%' },
+          grid: { color: 'rgba(0,0,0,0.05)' }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { font: { size: 12 } }
+        }
+      }
+    }
+  });
+
+  const diffLabels = DATA.difficultyDistribution.map(d => d.label);
+  const diffDatasets = [0, 1, 2, 3].map(i => ({
+    label: SCORE_LABELS[i],
+    data: DATA.difficultyDistribution.map(d => d.counts[i]),
+    backgroundColor: SCORE_COLORS[i],
+    borderWidth: 0,
+    borderRadius: i === 3 ? 3 : 0,
+  }));
+
+  new Chart(document.getElementById('difficultyChart'), {
+    type: 'bar',
+    data: { labels: diffLabels, datasets: diffDatasets },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { boxWidth: 12, padding: 16, font: { size: 12 } }
+        },
+        tooltip: { mode: 'index' }
+      },
+      scales: {
+        x: {
+          stacked: true,
+          grid: { display: false }
+        },
+        y: {
+          stacked: true,
+          ticks: { stepSize: 1 },
+          grid: { color: 'rgba(0,0,0,0.05)' }
+        }
+      }
+    }
+  });
+
+  const DIFF_RANK = { easy: 0, medium: 1, hard: 2 };
+  let sortCol = null;
+  let sortDir = 1;
+  let rows = [...DATA.rows];
+
+  function renderTable() {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+    rows.forEach(r => {
+      const tr = document.createElement('tr');
+
+      const tdQ = document.createElement('td');
+      tdQ.className = 'td-question';
+      const qText = document.createElement('div');
+      qText.className = 'td-question-text';
+      qText.textContent = r.question;
+      qText.title = r.question;
+      tdQ.appendChild(qText);
+
+      const tdCat = document.createElement('td');
+      tdCat.className = 'td-category';
+      tdCat.textContent = r.category;
+
+      const tdDiff = document.createElement('td');
+      const diffBadge = document.createElement('span');
+      diffBadge.className = 'badge badge-diff badge-diff-' + r.difficulty.toLowerCase();
+      diffBadge.textContent = r.difficulty;
+      tdDiff.appendChild(diffBadge);
+
+      const tdScore = document.createElement('td');
+      tdScore.className = 'td-score';
+      const scoreBadge = document.createElement('span');
+      scoreBadge.className = 'badge badge-score-' + r.score;
+      scoreBadge.textContent = r.score;
+      scoreBadge.setAttribute('aria-label', 'Score ' + r.score + ' out of 3');
+      tdScore.appendChild(scoreBadge);
+
+      const tdReason = document.createElement('td');
+      tdReason.className = 'td-reasoning';
+      tdReason.textContent = r.reasoning;
+
+      tr.append(tdQ, tdCat, tdDiff, tdScore, tdReason);
+      tbody.appendChild(tr);
+    });
+  }
+
+  function sortBy(col) {
+    document.querySelectorAll('th[data-sort]').forEach(th => th.setAttribute('aria-sort', 'none'));
+
+    if (sortCol === col) {
+      sortDir *= -1;
+    } else {
+      sortCol = col;
+      sortDir = 1;
+    }
+
+    document.querySelector('th[data-sort="' + col + '"]')
+      .setAttribute('aria-sort', sortDir === 1 ? 'ascending' : 'descending');
+
+    rows.sort((a, b) => {
+      if (col === 'score') return (a[col] - b[col]) * sortDir;
+      if (col === 'difficulty') return (DIFF_RANK[a[col].toLowerCase()] - DIFF_RANK[b[col].toLowerCase()]) * sortDir;
+      return a[col].localeCompare(b[col]) * sortDir;
+    });
+
+    renderTable();
+  }
+
+  document.querySelectorAll('th[data-sort]').forEach(th => {
+    th.addEventListener('click', () => sortBy(th.dataset.sort));
+  });
+
+  renderTable();
+</script>
+</body>
+</html>

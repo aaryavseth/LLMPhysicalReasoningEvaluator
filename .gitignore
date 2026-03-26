@@ -1,0 +1,6 @@
+.env
+.agents/
+.claude/
+__pycache__/
+*.pyc
+results/*.json

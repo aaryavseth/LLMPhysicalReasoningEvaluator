@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Benchmark Results</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:              #0a0a0a;
+      --surface:         #111111;
+      --surface-raised:  #161616;
+      --border:          rgba(255,255,255,0.08);
+      --border-subtle:   rgba(255,255,255,0.04);
+      --text-primary:    rgba(255,255,255,0.92);
+      --text-secondary:  rgba(255,255,255,0.55);
+      --text-muted:      rgba(255,255,255,0.32);
+      --accent:          #00aaff;
+      --accent-warn:     #f59e0b;
+      --accent-neg:      #ff3366;
+      --accent-teal:     #00c8b4;
+      --score-0-bg: rgba(255,51,102,0.12);   --score-0-fg: #ff3366;
+      --score-1-bg: rgba(245,158,11,0.12);   --score-1-fg: #f59e0b;
+      --score-2-bg: rgba(0,200,180,0.12);    --score-2-fg: #00c8b4;
+      --score-3-bg: rgba(0,170,255,0.12);    --score-3-fg: #00aaff;
+      --diff-easy-bg:   rgba(0,170,255,0.1);   --diff-easy-fg:   #00aaff;
+      --diff-medium-bg: rgba(245,158,11,0.1);  --diff-medium-fg: #f59e0b;
+      --diff-hard-bg:   rgba(255,51,102,0.1);  --diff-hard-fg:   #ff3366;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      background: var(--bg);
+      color: var(--text-primary);
+    }
+
+    .topbar {
+      background: #080808;
+      border-bottom: 1px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      height: 52px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 20px; }
+    .topbar-title { font-weight: 500; font-size: 14px; color: var(--text-primary); }
+    .topbar-model {
+      font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .topbar-right { display: none; }
+
+    main { max-width: 1280px; margin: 0 auto; padding: 32px 32px 64px; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px 24px 20px;
+    }
+    .card-label {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .card-value {
+      font-size: 28px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+      color: var(--text-primary);
+    }
+    .card-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .val-blue  { color: var(--accent);      text-shadow: 0 0 22px rgba(0,170,255,0.5); }
+    .val-amber { color: var(--accent-warn);  text-shadow: 0 0 22px rgba(245,158,11,0.4); }
+    .val-red   { color: var(--accent-neg);   text-shadow: 0 0 22px rgba(255,51,102,0.45); }
+
+    .charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .chart-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+    }
+    .chart-box h2 {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+    .chart-box canvas { display: block; width: 100% !important; }
+
+    .table-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .table-header h2 {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-secondary);
+    }
+    .table-hint { font-size: 12px; color: var(--text-muted); }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+    thead th {
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      background: var(--surface);
+    }
+    th[data-sort] { cursor: pointer; user-select: none; }
+    th[data-sort]:hover { color: var(--text-primary); }
+    th[aria-sort="ascending"]::after  { content: " \2191"; opacity: 1; }
+    th[aria-sort="descending"]::after { content: " \2193"; opacity: 1; }
+    th[data-sort]::after { content: " \2195"; opacity: 0.3; }
+
+    tbody tr {
+      border-left: 3px solid transparent;
+      transition: border-left-color 150ms ease-out, background 150ms ease-out;
+    }
+    tbody tr:nth-child(even) { background: var(--surface-raised); }
+    tbody tr:hover {
+      border-left-color: var(--accent);
+      background: rgba(0,170,255,0.04);
+    }
+    tbody td {
+      padding: 11px 16px;
+      vertical-align: top;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    .td-question { max-width: 320px; color: var(--text-primary); }
+    .td-question-text { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .td-category { color: var(--text-secondary); white-space: nowrap; }
+    .td-score { white-space: nowrap; }
+    .td-reasoning { color: var(--text-secondary); font-size: 12px; line-height: 1.6; max-width: 380px; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 22px;
+      padding: 0 7px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+    .badge-score-0 { background: var(--score-0-bg); color: var(--score-0-fg); }
+    .badge-score-1 { background: var(--score-1-bg); color: var(--score-1-fg); }
+    .badge-score-2 { background: var(--score-2-bg); color: var(--score-2-fg); }
+    .badge-score-3 { background: var(--score-3-bg); color: var(--score-3-fg); }
+
+    .badge-diff {
+      display: inline-flex;
+      align-items: center;
+      height: 20px;
+      padding: 0 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 400;
+    }
+    .badge-diff-easy   { background: var(--diff-easy-bg);   color: var(--diff-easy-fg); }
+    .badge-diff-medium { background: var(--diff-medium-bg); color: var(--diff-medium-fg); }
+    .badge-diff-hard   { background: var(--diff-hard-bg);   color: var(--diff-hard-fg); }
+
+    @media (max-width: 900px) {
+      .cards { grid-template-columns: repeat(2, 1fr); }
+      .charts { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .cards { grid-template-columns: 1fr 1fr; }
+      main { padding: 16px 16px 48px; }
+      .topbar { padding: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="topbar" role="banner">
+  <div class="topbar-left">
+    <span class="topbar-title">Physical Reasoning Benchmark</span>
+    <span class="topbar-model" id="topbarModel"></span>
+  </div>
+  <div class="topbar-right"></div>
+</header>
+
+<main>
+  <div class="cards" role="region" aria-label="Summary metrics">
+    <div class="card">
+      <div class="card-label">Overall score</div>
+      <div class="card-value" id="metricOverallPct"></div>
+      <div class="card-sub" id="metricOverallAvg"></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Best category</div>
+      <div class="card-value val-blue" id="metricBestPct"></div>
+      <div class="card-sub" id="metricBestName"></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Worst category</div>
+      <div class="card-value val-red" id="metricWorstPct"></div>
+      <div class="card-sub" id="metricWorstName"></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Avg judge score</div>
+      <div class="card-value" id="metricAvgScore"></div>
+      <div class="card-sub">out of 3.00</div>
+    </div>
+  </div>
+
+  <div class="charts" role="region" aria-label="Charts">
+    <div class="chart-box">
+      <h2>Accuracy by category</h2>
+      <canvas id="categoryChart" aria-label="Horizontal bar chart of accuracy percentage per category"></canvas>
+    </div>
+    <div class="chart-box">
+      <h2>Score distribution by difficulty</h2>
+      <canvas id="difficultyChart" aria-label="Stacked bar chart of score distribution by difficulty"></canvas>
+    </div>
+  </div>
+
+  <div class="table-section" role="region" aria-label="Results table">
+    <div class="table-header">
+      <h2>All results</h2>
+      <span class="table-hint">Click column headers to sort</span>
+    </div>
+    <div class="table-wrap">
+      <table id="resultsTable">
+        <thead>
+          <tr>
+            <th scope="col">Question</th>
+            <th scope="col" data-sort="category" aria-sort="none">Category</th>
+            <th scope="col" data-sort="difficulty" aria-sort="none">Difficulty</th>
+            <th scope="col" data-sort="score" aria-sort="none">Score</th>
+            <th scope="col">Judge reasoning</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+  const DATA = {"model": "llama-3.3-70b-versatile", "timestamp": "2026-03-25 19:56:59", "totalQuestions": 40, "overallAvg": 1.9, "overallPct": 63.3, "bestCategory": {"name": "Thermal Expansion", "pct": 80.0}, "worstCategory": {"name": "Buoyancy", "pct": 46.7}, "categories": [{"name": "Buoyancy", "avg": 1.4, "pct": 46.7, "count": 5}, {"name": "Center of Mass", "avg": 1.8, "pct": 60.0, "count": 5}, {"name": "Collisions & Momentum", "avg": 1.8, "pct": 60.0, "count": 5}, {"name": "Fluid Dynamics", "avg": 1.8, "pct": 60.0, "count": 5}, {"name": "Friction & Inclines", "avg": 2.0, "pct": 66.7, "count": 5}, {"name": "Gravity & Projectiles", "avg": 2.0, "pct": 66.7, "count": 5}, {"name": "Levers & Torque", "avg": 2.0, "pct": 66.7, "count": 5}, {"name": "Thermal Expansion", "avg": 2.4, "pct": 80.0, "count": 5}], "difficultyDistribution": [{"label": "Easy", "counts": [0, 2, 1, 6]}, {"label": "Medium", "counts": [1, 2, 10, 5]}, {"label": "Hard", "counts": [3, 3, 7, 0]}], "rows": [{"id": "gp_001", "question": "A ball is thrown horizontally from the top of a cliff. A second ball is dropped straight down from the same height at the same instant. Which hits the ground first, and why?", "category": "Gravity & Projectiles", "difficulty": "Medium", "score": 3, "reasoning": "The student provided a clear and concise explanation of the key concept that horizontal velocity has no effect on the vertical motion under constant acceleration due to gravity, demonstrating a strong understanding of the physical principles involved. Their answer also included the relevant numerical value for the acceleration due to gravity, further showing their comprehension of the topic."}, {"id": "gp_002", "question": "You fire a bullet horizontally and simultaneously drop an identical bullet from the same height. Ignoring air resistance, which bullet hits the ground first?", "category": "Gravity & Projectiles", "difficulty": "Easy", "score": 3, "reasoning": "The student correctly addresses the crucial point that the horizontal velocity of the fired bullet has no impact on its vertical fall time, and they provide a clear and concise explanation highlighting the role of gravity's acceleration in both scenarios."}, {"id": "gp_003", "question": "A projectile is launched at 45° for maximum range on flat ground. If the same launch speed is used but the ground slopes downward in the direction of travel, is the optimal angle still 45°?", "category": "Gravity & Projectiles", "difficulty": "Hard", "score": 1, "reasoning": "Although the student correctly identifies the correct direction (less than 45°), they lack the key physical insight that explains why this is the case, specifically the effect of an effective gravity component combined with increased flight time."}, {"id": "gp_004", "question": "Two identical cannonballs are fired from the same cannon: one at 30° and one at 60° above horizontal, with the same muzzle speed. Compare their ranges and times of flight.", "category": "Gravity & Projectiles", "difficulty": "Medium", "score": 0, "reasoning": "The student incorrectly concluded that the cannonball fired at 60° has a longer range, which contradicts the understanding that they will have equal ranges due to complementary angles. They also failed to explain why the 60° shot would have a longer time of flight, missing the key physical insight that it reaches a greater height and spends more time in the air."}, {"id": "gp_005", "question": "An astronaut on the Moon throws a ball at the same angle and speed as on Earth. The Moon's gravity is 1/6 of Earth's. How does the range on the Moon compare to the range on Earth?", "category": "Gravity & Projectiles", "difficulty": "Easy", "score": 3, "reasoning": "The student clearly and accurately explains why the range is 6 times greater on the Moon, properly connecting the reduction in gravity to the increased horizontal distance and resulting increased range. Their use of specific language ('pulled down by gravity') demonstrates a clear understanding of the underlying physics."}, {"id": "cm_001", "question": "A moving bowling ball strikes a stationary ping-pong ball head-on in a perfectly elastic collision. Describe what happens to each ball's velocity after the collision.", "category": "Collisions & Momentum", "difficulty": "Hard", "score": 2, "reasoning": "The student's response acknowledges the mass difference and the transfer of velocity, but doesn't accurately describe the outcome of the collision, particularly the velocity of the ping-pong ball, which is supposed to be approximately twice the bowling ball's initial speed."}, {"id": "cm_002", "question": "Two ice skaters push off each other from rest. Skater A (80 kg) ends up moving at 3 m/s east. Skater B (60 kg) ends up moving west. What is Skater B's speed?", "category": "Collisions & Momentum", "difficulty": "Easy", "score": 2, "reasoning": "The student correctly applies the law of conservation of momentum, but falters in justifying why Skater B's momentum must be -240 kg*m/s, instead of explaining that the negative sign comes from the direction, not the magnitude."}, {"id": "cm_003", "question": "A bullet embeds itself in a stationary wooden block on a frictionless surface. Is kinetic energy conserved? Is momentum conserved? Explain the difference.", "category": "Collisions & Momentum", "difficulty": "Medium", "score": 3, "reasoning": "The student provides a clear and complete explanation of both conservation laws, correctly accounting for the loss of kinetic energy due to inelastic deformation and accurately identifying momentum as conserved due to the absence of external forces."}, {"id": "cm_004", "question": "A ball bounces off a wall and returns at the same speed. Has the wall exerted an impulse on the ball? Has work been done on the ball?", "category": "Collisions & Momentum", "difficulty": "Medium", "score": 2, "reasoning": "The student correctly identifies the direction change of the ball's momentum and understands that work is not done, but the explanation given for zero net work is incorrect – it's because the direction of the force (normal force), not the displacement, doesn't align with the direction of the displacement, and the force is perpendicular, but also in the opposite direction of the displacement, thus resulting in the change of kinetic energy."}, {"id": "cm_005", "question": "Two identical cars collide head-on at equal speeds and stick together. How does the collision energy loss compare to one car hitting an identical stationary car and sticking?", "category": "Collisions & Momentum", "difficulty": "Hard", "score": 0, "reasoning": "The student fails to address the fundamental difference in the final velocity between the two scenarios, which leads to a crucial error in the calculation of energy loss."}, {"id": "fd_001", "question": "Water flows through a pipe that narrows from a wide section to a narrow section. In which section is the water pressure higher, and why?", "category": "Fluid Dynamics", "difficulty": "Medium", "score": 3, "reasoning": "The student correctly identifies the wider section as having higher pressure, and provides a clear explanation of the physical principles that explain this phenomenon, citing conservation of mass and Bernoulli's principle. The student's explanation effectively conveys the relationship between velocity and pressure in converging pipe flow."}, {"id": "fd_002", "question": "A boat is floating in a small pond. The boat contains a large iron anchor. If you throw the anchor overboard into the pond, does the water level rise, fall, or stay the same?", "category": "Fluid Dynamics", "difficulty": "Hard", "score": 0, "reasoning": "The student's explanation is incorrect, focusing on the initial buoyancy of the boat rather than the volume displacement of the anchor, and incorrectly assuming the water level rises due to the anchor submerging. The key insight that the anchor displaces less water when submerged is entirely overlooked."}, {"id": "fd_003", "question": "A syringe is held with the needle pointing up, filled halfway with water, with a bubble of air above the water. If you push the plunger slowly, what happens to the air bubble volume?", "category": "Fluid Dynamics", "difficulty": "Medium", "score": 1, "reasoning": "The response is partially correct, as it acknowledges the decrease in air bubble volume, but lacks the key physical insight explaining why this happens: the relationship between air pressure and volume, described by Boyle's Law."}, {"id": "fd_004", "question": "Two identical containers are filled to the same depth: one with water, one with mercury. At the bottom of each container, which has greater pressure, and by approximately how much?", "category": "Fluid Dynamics", "difficulty": "Easy", "score": 3, "reasoning": "The student correctly identifies that the mercury container has greater pressure and provides a clear physical explanation for the relationship between density and pressure, specifically mentioning direct proportionality and the specific factor of 13.6."}, {"id": "fd_005", "question": "A spinning ball moves through the air. Explain why it curves, and in which direction relative to its spin axis.", "category": "Fluid Dynamics", "difficulty": "Hard", "score": 2, "reasoning": "The student's response correctly identifies the Magnus force as the cause for the ball's curve, but the explanation is incomplete and unclear in its description of the spin axis' influence on the curve direction, not addressing the role of velocity and pressure differences."}, {"id": "lt_001", "question": "A 2-meter seesaw is balanced at its center. A 40 kg child sits 0.5 m from the center on the left. Where must a 20 kg child sit on the right to balance it?", "category": "Levers & Torque", "difficulty": "Easy", "score": 3, "reasoning": "The student correctly applies the principle of torque balance and uses mathematical equations to derive the correct solution, demonstrating a thorough understanding of the physical concept. The explanation is also clear, concise, and accurately represents the relationship between the two children's positions on the seesaw."}, {"id": "lt_002", "question": "You can open a door easily by pushing near the edge, but it's very hard to push near the hinge. Explain using torque, and why door handles are always placed far from the hinge.", "category": "Levers & Torque", "difficulty": "Easy", "score": 1, "reasoning": "The student correctly states that a greater distance from the hinge increases torque, but fails to recognize that this is due to the moment arm (perpendicular distance) rather than the simple distance from the hinge. They also mistakenly equate distance with moment arm."}, {"id": "lt_003", "question": "A uniform horizontal beam of mass M and length L is attached to a wall at one end. A weight W hangs from the free end. A cable supports the beam at its midpoint at angle θ above horizontal. What is the tension in the cable?", "category": "Levers & Torque", "difficulty": "Hard", "score": 2, "reasoning": "The student is mostly correct in expressing the equations for equilibrium, but they introduce unnecessary complexity by solving for components and using the Pythagorean theorem; a much simpler solution can be obtained by combining these equations correctly, and the provided formula for optimal angle is not relevant to the question."}, {"id": "lt_004", "question": "A wrench applies torque to a bolt. If you double the length of the wrench handle and apply the same force, how does the torque change? If you keep the same handle but push at 30° instead of perpendicular, what fraction of torque remains?", "category": "Levers & Torque", "difficulty": "Medium", "score": 2, "reasoning": "The student correctly identifies that torque is directly proportional to distance and correctly calculates the fraction of torque that remains when pushing at 30°. However, the student incorrectly represents the torque equation as τ = r × F, which should be τ = F × r, and fails to mention that pushing perpendicular to the handle is necessary for maximum torque."}, {"id": "lt_005", "question": "A person stands on a scale in an elevator. The scale reads their true weight when the elevator is still. When the elevator accelerates upward, does the scale read more, less, or the same? What about during deceleration while going up?", "category": "Levers & Torque", "difficulty": "Medium", "score": 2, "reasoning": "The student correctly identifies the change in the scale reading during acceleration, but they don't provide a clear explanation of what the scale actually measures, which is a key point in understanding the difference between true weight and apparent weight."}, {"id": "te_001", "question": "A steel bridge has expansion joints built into it. Why? What would happen if a bridge were built without them?", "category": "Thermal Expansion", "difficulty": "Easy", "score": 3, "reasoning": "The student's response accurately identifies the reason for expansion joints and correctly describes the potential consequences of a bridge without them, showcasing a clear understanding of the thermal expansion and contraction of steel. The explanation is thorough and effectively conveys the physical reasoning behind this engineering design choice."}, {"id": "te_002", "question": "A metal ball barely fits through a metal ring at room temperature. If you heat only the ring, does the ball fit through? If you heat only the ball, does it fit?", "category": "Thermal Expansion", "difficulty": "Medium", "score": 2, "reasoning": "The student has the correct outcome for both scenarios, but the reasoning for why the ball doesn't fit when heated while the ring is not shows a lack of understanding that the ring's expansion would increase its diameter, allowing the ball to fit."}, {"id": "te_003", "question": "Water is unusual among liquids in its thermal expansion behavior near 4°C. Describe this anomaly and explain one major consequence for aquatic life.", "category": "Thermal Expansion", "difficulty": "Medium", "score": 2, "reasoning": "The student correctly identifies the density anomaly near 4°C but fails to explicitly describe the physical reason behind it, and although they partially explain the consequence, it lacks clarity and depth in relation to the specific temperature behavior."}, {"id": "te_004", "question": "A glass jar with a metal lid is stuck. Someone suggests running hot water over the lid. Why does this work, and why is it better to heat the lid than the glass?", "category": "Thermal Expansion", "difficulty": "Medium", "score": 3, "reasoning": "The student correctly states the reason heating the lid works and identifies the key factor of thermal expansion differences between metals and glass. They also provide a logical explanation for why heating the glass is not a good idea, considering thermal shock."}, {"id": "te_005", "question": "A bimetallic strip is made of brass and steel bonded together. When heated, which way does it bend, and why? How does this principle appear in everyday devices?", "category": "Thermal Expansion", "difficulty": "Hard", "score": 2, "reasoning": "The student is partially correct about the direction of the bend and the thermal expansion coefficients, but the explanation is weak because it doesn't explicitly mention the relationship between thermal expansion and force, implying a straightforward lengthening without specifying how it results in bending."}, {"id": "com_001", "question": "A hammer is tossed spinning through the air. Which point on the hammer follows a smooth parabolic path?", "category": "Center of Mass", "difficulty": "Medium", "score": 2, "reasoning": "The student correctly identifies the center of mass as the point that follows a smooth parabolic path, but fails to acknowledge that all other points follow complex paths due to the hammer's rotation, which is a crucial aspect of the physics involved."}, {"id": "com_002", "question": "A person stands at one end of a frictionless boat at rest on still water. They walk to the other end. When they stop, has the boat moved? If so, in which direction and how far?", "category": "Center of Mass", "difficulty": "Hard", "score": 2, "reasoning": "The student correctly identifies the direction and cause of the boat's movement but fails to provide a clear and accurate mathematical relationship to describe the displacement, as evidenced by their incomplete mass ratio description."}, {"id": "com_003", "question": "Can the center of mass of an object lie outside the physical material of the object? Give an example.", "category": "Center of Mass", "difficulty": "Medium", "score": 2, "reasoning": "The student correctly identifies that the center of mass can lie outside the physical material of an object, but their explanation of a hollow sphere or ring being the example is incomplete, as they miss the key point about the weighted average position not necessarily being at a material point, and don't provide alternative examples."}, {"id": "com_004", "question": "A uniform rectangular table has one leg removed. The table has four legs at its corners. At what point on the tabletop could you balance the table on a single support to keep it level?", "category": "Center of Mass", "difficulty": "Hard", "score": 2, "reasoning": "The student's response identifies the geometric center as the correct location, but the explanation lacks clarity and reference to the principle that the center of mass remains at the same point after the removal of a leg, and does not describe how this is related to being the \"center\" of the table."}, {"id": "com_005", "question": "A rocket in deep space (no gravity) fires its engine. Does the center of mass of the rocket-plus-exhaust system accelerate?", "category": "Center of Mass", "difficulty": "Hard", "score": 1, "reasoning": "The student correctly uses conservation of momentum, but fails to explain why this implies a constant velocity for the system's center of mass, rather than no motion at all. They also overlook that the system's initial momentum was not actually zero in isolation."}, {"id": "fi_001", "question": "A block sits on an inclined plane. As the angle of inclination increases from 0° to 90°, describe what happens to the static friction force on the block before it starts to slide.", "category": "Friction & Inclines", "difficulty": "Medium", "score": 1, "reasoning": "The student correctly states that the static friction force initially increases with angle, but misses the key physical insight that the maximum static friction force is determined by the balance between the increasing sliding force and the decreasing normal force, not solely by the angle of repose. This lack of understanding leads to incorrect predictions about the maximum static friction force and when it occurs."}, {"id": "fi_002", "question": "Kinetic friction is often said to be independent of sliding speed and contact area. Explain why contact area independence seems paradoxical, and what is actually happening at the microscopic level.", "category": "Friction & Inclines", "difficulty": "Hard", "score": 2, "reasoning": "The student's explanation is correct, but it lacks the crucial detail about the \"asperity bonding,\" which is essential for fully understanding why the reduced pressure at each point leads to a constant frictional force."}, {"id": "fi_003", "question": "A car brakes hard enough to lock its wheels (skidding). Is it braking more effectively or less effectively than braking just to the edge of locking? Why?", "category": "Friction & Inclines", "difficulty": "Medium", "score": 3, "reasoning": "The student correctly explained that the coefficient of kinetic friction is less than the coefficient of static friction, leading to less effective braking when wheels are locked. Their explanation is clear and concise, providing a good physical understanding of the situation."}, {"id": "fi_004", "question": "Two identical blocks are stacked on each other on a frictionless table. A horizontal force is applied to the bottom block. What determines whether the blocks move together or slide over each other?", "category": "Friction & Inclines", "difficulty": "Medium", "score": 2, "reasoning": "The student correctly identifies the coefficient of static friction as the key factor, and is close to describing the necessary relationship between the applied force and the static frictional force; however, the explanation is incomplete and does not explicitly mention the total mass, acceleration, and their relationship to the top block's mass, which are essential components of the correct answer."}, {"id": "fi_005", "question": "A block is pushed against a vertical wall with a horizontal force. What is the minimum horizontal force needed to prevent the block from sliding down?", "category": "Friction & Inclines", "difficulty": "Medium", "score": 2, "reasoning": "The student correctly states that F = mg, but fails to acknowledge the role of the coefficient of static friction (μ_s) in determining the required force, leading to an incomplete explanation."}, {"id": "bu_001", "question": "A ship made of steel floats, but a solid steel ball sinks. Explain how the ship floats despite being made of the same material.", "category": "Buoyancy", "difficulty": "Easy", "score": 3, "reasoning": "The student's explanation is fully correct and effectively conveys the key physical insight, accurately highlighting the role of the air-filled spaces in reducing the overall density of the ship and enabling it to float. The comparison to the solid steel ball is also a nice touch, making the explanation more comprehensive and understandable."}, {"id": "bu_002", "question": "A fish bladder (swim bladder) allows fish to remain neutrally buoyant at various depths. However, if a fish is quickly moved to a much greater depth, what happens and why?", "category": "Buoyancy", "difficulty": "Medium", "score": 2, "reasoning": "The student identifies the correct outcome of the fish becoming negatively buoyant and sinking, but fails to explicitly state the physical reason behind this, which is the reduction in volume of the swim bladder due to increased pressure. A clearer explanation that includes the effect of pressure on gas volume would have earned a higher score."}, {"id": "bu_003", "question": "You place a sealed empty bottle (air inside) in water and push it fully submerged. Compare the buoyant force when it is 0.5 m deep versus 5 m deep.", "category": "Buoyancy", "difficulty": "Hard", "score": 1, "reasoning": "The student identifies that the volume (and thus the buoyant force) remains the same due to the bottle's rigid walls, but fails to recognize the effect of water pressure on the air inside the bottle, which is a crucial aspect of understanding the slight decrease in buoyant force at 5m depth."}, {"id": "bu_004", "question": "A helium balloon is inside a sealed car. The car accelerates forward. Which direction does the balloon move relative to the car — forward, backward, or does it stay put?", "category": "Buoyancy", "difficulty": "Hard", "score": 0, "reasoning": "The student's response is wrong and does not demonstrate any understanding of the underlying physics, including the concept of relative motion in the non-inertial frame of the accelerating car."}, {"id": "bu_005", "question": "A block of wood floats in water with 70% of its volume submerged. What is the wood's density relative to water?", "category": "Buoyancy", "difficulty": "Easy", "score": 1, "reasoning": "The student correctly identifies that the wood's density is 0.7 times the density of water, but fails to explicitly state that the wood's density is in fact 700 g/cm³ (the same as water's density), and incorrectly suggests that water's density is 1 g/cm³, when in fact 1 g/cm³ is the general density value given for water and the answer would still make more sense if he just stated that the final value for the wood density would be the percentage of the density value of water given."}]};
+
+  Chart.defaults.color = 'rgba(255,255,255,0.45)';
+  Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+  Chart.defaults.font.family = "system-ui, -apple-system, 'Segoe UI', sans-serif";
+  Chart.defaults.font.size = 12;
+
+  const SCORE_COLORS = ['#ff3366', '#f59e0b', '#00c8b4', '#00aaff'];
+  const SCORE_LABELS = ['Score 0', 'Score 1', 'Score 2', 'Score 3'];
+
+  function pctColor(pct) {
+    if (pct >= 75) return '#00aaff';
+    if (pct >= 50) return '#f59e0b';
+    return '#ff3366';
+  }
+
+  function pctColorClass(pct) {
+    if (pct >= 75) return 'val-blue';
+    if (pct >= 50) return 'val-amber';
+    return 'val-red';
+  }
+
+  function setText(id, text) {
+    document.getElementById(id).textContent = text;
+  }
+
+  setText('topbarModel', DATA.model);
+
+  const overallEl = document.getElementById('metricOverallPct');
+  overallEl.textContent = DATA.overallPct + '%';
+  overallEl.classList.add(pctColorClass(DATA.overallPct));
+  setText('metricOverallAvg', DATA.overallAvg.toFixed(2) + ' avg score');
+
+  setText('metricBestPct', DATA.bestCategory.pct + '%');
+  setText('metricBestName', DATA.bestCategory.name);
+  setText('metricWorstPct', DATA.worstCategory.pct + '%');
+  setText('metricWorstName', DATA.worstCategory.name);
+
+  const avgEl = document.getElementById('metricAvgScore');
+  avgEl.textContent = DATA.overallAvg.toFixed(2);
+  avgEl.classList.add(pctColorClass(DATA.overallPct));
+
+  const catLabels = DATA.categories.map(c => c.name);
+  const catPcts = DATA.categories.map(c => c.pct);
+  const catColors = catPcts.map(p => pctColor(p));
+
+  new Chart(document.getElementById('categoryChart'), {
+    type: 'bar',
+    data: {
+      labels: catLabels,
+      datasets: [{
+        data: catPcts,
+        backgroundColor: catColors,
+        borderWidth: 0,
+        borderRadius: 3,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ' ' + ctx.parsed.x.toFixed(1) + '%'
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0,
+          max: 100,
+          ticks: { callback: v => v + '%' },
+          grid: { color: 'rgba(255,255,255,0.06)' }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { font: { size: 12 } }
+        }
+      }
+    }
+  });
+
+  const diffLabels = DATA.difficultyDistribution.map(d => d.label);
+  const diffDatasets = [0, 1, 2, 3].map(i => ({
+    label: SCORE_LABELS[i],
+    data: DATA.difficultyDistribution.map(d => d.counts[i]),
+    backgroundColor: SCORE_COLORS[i],
+    borderWidth: 0,
+    borderRadius: i === 3 ? 3 : 0,
+  }));
+
+  new Chart(document.getElementById('difficultyChart'), {
+    type: 'bar',
+    data: { labels: diffLabels, datasets: diffDatasets },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { boxWidth: 12, padding: 16, font: { size: 12 }, color: 'rgba(255,255,255,0.55)' }
+        },
+        tooltip: { mode: 'index' }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false } },
+        y: {
+          stacked: true,
+          ticks: { stepSize: 1 },
+          grid: { color: 'rgba(255,255,255,0.06)' }
+        }
+      }
+    }
+  });
+
+  const DIFF_RANK = { easy: 0, medium: 1, hard: 2 };
+  let sortCol = null;
+  let sortDir = 1;
+  let rows = [...DATA.rows];
+
+  function renderTable() {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+    rows.forEach(r => {
+      const tr = document.createElement('tr');
+
+      const tdQ = document.createElement('td');
+      tdQ.className = 'td-question';
+      const qText = document.createElement('div');
+      qText.className = 'td-question-text';
+      qText.textContent = r.question;
+      qText.title = r.question;
+      tdQ.appendChild(qText);
+
+      const tdCat = document.createElement('td');
+      tdCat.className = 'td-category';
+      tdCat.textContent = r.category;
+
+      const tdDiff = document.createElement('td');
+      const diffBadge = document.createElement('span');
+      diffBadge.className = 'badge badge-diff badge-diff-' + r.difficulty.toLowerCase();
+      diffBadge.textContent = r.difficulty;
+      tdDiff.appendChild(diffBadge);
+
+      const tdScore = document.createElement('td');
+      tdScore.className = 'td-score';
+      const scoreBadge = document.createElement('span');
+      scoreBadge.className = 'badge badge-score-' + r.score;
+      scoreBadge.textContent = r.score;
+      scoreBadge.setAttribute('aria-label', 'Score ' + r.score + ' out of 3');
+      tdScore.appendChild(scoreBadge);
+
+      const tdReason = document.createElement('td');
+      tdReason.className = 'td-reasoning';
+      tdReason.textContent = r.reasoning;
+
+      tr.append(tdQ, tdCat, tdDiff, tdScore, tdReason);
+      tbody.appendChild(tr);
+    });
+  }
+
+  function sortBy(col) {
+    document.querySelectorAll('th[data-sort]').forEach(th => th.setAttribute('aria-sort', 'none'));
+
+    if (sortCol === col) {
+      sortDir *= -1;
+    } else {
+      sortCol = col;
+      sortDir = 1;
+    }
+
+    document.querySelector('th[data-sort="' + col + '"]')
+      .setAttribute('aria-sort', sortDir === 1 ? 'ascending' : 'descending');
+
+    rows.sort((a, b) => {
+      if (col === 'score') return (a[col] - b[col]) * sortDir;
+      if (col === 'difficulty') return (DIFF_RANK[a[col].toLowerCase()] - DIFF_RANK[b[col].toLowerCase()]) * sortDir;
+      return a[col].localeCompare(b[col]) * sortDir;
+    });
+
+    renderTable();
+  }
+
+  document.querySelectorAll('th[data-sort]').forEach(th => {
+    th.addEventListener('click', () => sortBy(th.dataset.sort));
+  });
+
+  renderTable();
+</script>
+</body>
+</html>

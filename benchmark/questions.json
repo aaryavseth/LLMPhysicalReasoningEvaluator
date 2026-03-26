@@ -1,0 +1,324 @@
+{
+  "questions": [
+    {
+      "id": "gp_001",
+      "category": "Gravity & Projectiles",
+      "question": "A ball is thrown horizontally from the top of a cliff. A second ball is dropped straight down from the same height at the same instant. Which hits the ground first, and why?",
+      "correct_answer": "They hit the ground at exactly the same time. Horizontal velocity has no effect on the vertical component of motion. Both balls experience the same downward acceleration due to gravity and fall the same vertical distance.",
+      "difficulty": "medium",
+      "explanation": "This is a classic demonstration of independence of motion components. The horizontal throw gives the first ball horizontal velocity, not vertical. Both balls have zero initial vertical velocity and the same gravitational acceleration, so they reach the ground simultaneously despite different landing positions."
+    },
+    {
+      "id": "gp_002",
+      "category": "Gravity & Projectiles",
+      "question": "You fire a bullet horizontally and simultaneously drop an identical bullet from the same height. Ignoring air resistance, which bullet hits the ground first?",
+      "correct_answer": "Both hit simultaneously. This is the same principle as the ball drop: horizontal velocity does not affect vertical free-fall. The fired bullet travels much farther horizontally but still takes the same time to fall.",
+      "difficulty": "easy",
+      "explanation": "A common misconception is that the fast-moving bullet 'stays up' longer. In fact its horizontal motion is entirely independent of vertical free-fall. Both bullets accelerate downward at g from rest in the vertical direction."
+    },
+    {
+      "id": "gp_003",
+      "category": "Gravity & Projectiles",
+      "question": "A projectile is launched at 45° for maximum range on flat ground. If the same launch speed is used but the ground slopes downward in the direction of travel, is the optimal angle still 45°?",
+      "correct_answer": "No. On a downward slope the optimal angle is less than 45°. The effective gravity component and extended flight time shift the optimal angle to below 45° — specifically (90° − slope angle) / 2 above the slope, which is less than 45° above horizontal.",
+      "difficulty": "hard",
+      "explanation": "The 45° result assumes a flat landing surface. When the ground slopes away from the launcher, the projectile has more downward distance to cover, and a flatter launch angle exploits the extended flight time more effectively. The optimal angle above the slope is 45°, but that translates to less than 45° from horizontal."
+    },
+    {
+      "id": "gp_004",
+      "category": "Gravity & Projectiles",
+      "question": "Two identical cannonballs are fired from the same cannon: one at 30° and one at 60° above horizontal, with the same muzzle speed. Compare their ranges and times of flight.",
+      "correct_answer": "They have equal ranges (complementary angles sum to 90°, giving the same range formula result). However, the 60° shot has a longer time of flight because it reaches greater height and spends more time in the air.",
+      "difficulty": "medium",
+      "explanation": "Range = v²sin(2θ)/g. Since sin(60°) = sin(120°) = sin(2×60°) and sin(2×30°) both equal sin(60°), ranges are equal. Time of flight = 2v·sinθ/g, which is larger for 60° since sin(60°) > sin(30°)."
+    },
+    {
+      "id": "gp_005",
+      "category": "Gravity & Projectiles",
+      "question": "An astronaut on the Moon throws a ball at the same angle and speed as on Earth. The Moon's gravity is 1/6 of Earth's. How does the range on the Moon compare to the range on Earth?",
+      "correct_answer": "The range on the Moon is 6 times greater. Range is proportional to 1/g, so with gravity reduced to 1/6, the range increases by a factor of 6.",
+      "difficulty": "easy",
+      "explanation": "Range = v²sin(2θ)/g. With g_Moon = g_Earth/6, Range_Moon = 6 × Range_Earth. The ball travels farther because the weaker gravitational field takes longer to bring it back down."
+    },
+    {
+      "id": "cm_001",
+      "category": "Collisions & Momentum",
+      "question": "A moving bowling ball strikes a stationary ping-pong ball head-on in a perfectly elastic collision. Describe what happens to each ball's velocity after the collision.",
+      "correct_answer": "The ping-pong ball shoots forward at approximately twice the bowling ball's initial speed. The bowling ball continues forward at nearly its original speed, barely slowed. This is a consequence of elastic collision equations when mass ratios are extreme.",
+      "difficulty": "hard",
+      "explanation": "For elastic collision with m1 >> m2: v1_final ≈ v1_initial, v2_final ≈ 2·v1_initial. The heavy ball acts like a moving wall. The light ball bounces off at roughly twice the relative speed of approach."
+    },
+    {
+      "id": "cm_002",
+      "category": "Collisions & Momentum",
+      "question": "Two ice skaters push off each other from rest. Skater A (80 kg) ends up moving at 3 m/s east. Skater B (60 kg) ends up moving west. What is Skater B's speed?",
+      "correct_answer": "4 m/s west. By conservation of momentum: total initial momentum is zero, so 80×3 = 60×v_B, giving v_B = 4 m/s.",
+      "difficulty": "easy",
+      "explanation": "The system starts at rest (zero total momentum). After the push, momenta must still sum to zero. 80 kg × 3 m/s east + 60 kg × v west = 0 → v = 4 m/s."
+    },
+    {
+      "id": "cm_003",
+      "category": "Collisions & Momentum",
+      "question": "A bullet embeds itself in a stationary wooden block on a frictionless surface. Is kinetic energy conserved? Is momentum conserved? Explain the difference.",
+      "correct_answer": "Momentum is conserved (no external horizontal force). Kinetic energy is NOT conserved — this is a perfectly inelastic collision. Energy is lost to heat, sound, and deformation of the wood and bullet.",
+      "difficulty": "medium",
+      "explanation": "Conservation of momentum applies whenever there is no net external force on the system. Kinetic energy conservation only holds for elastic collisions. The embedding process dissipates energy irreversibly."
+    },
+    {
+      "id": "cm_004",
+      "category": "Collisions & Momentum",
+      "question": "A ball bounces off a wall and returns at the same speed. Has the wall exerted an impulse on the ball? Has work been done on the ball?",
+      "correct_answer": "Yes, the wall exerts a large impulse — it reverses the ball's momentum, so the impulse equals twice the ball's initial momentum (directed away from the wall). No net work is done: the ball's speed (and thus kinetic energy) is unchanged.",
+      "difficulty": "medium",
+      "explanation": "Impulse = change in momentum = m(v_f − v_i) = m(v − (−v)) = 2mv. Net work = ΔKE = 0 since speed is unchanged. Impulse and work are distinct concepts — large force over short time can reverse momentum with zero net energy transfer."
+    },
+    {
+      "id": "cm_005",
+      "category": "Collisions & Momentum",
+      "question": "Two identical cars collide head-on at equal speeds and stick together. How does the collision energy loss compare to one car hitting an identical stationary car and sticking?",
+      "correct_answer": "The head-on collision dissipates twice as much kinetic energy as the moving-car scenario. In the head-on case the final velocity is zero (all KE lost). In the other case the pair moves at half speed, retaining 25% of initial KE, so 75% is lost versus 100%.",
+      "difficulty": "hard",
+      "explanation": "Head-on at speed v each: initial KE = 2×(½mv²) = mv². Final KE = 0. Loss = mv². One car at speed 2v hits stationary: initial KE = ½m(2v)² = 2mv². Final speed = v (momentum conservation with equal masses). Final KE = ½(2m)v² = mv². Loss = mv². Wait — equal loss. Actually for equal initial KE framing: head-on each at v, loss = mv²; single car at v hitting stationary, loss = ½ × ½mv² = ¼mv². The head-on scenario destroys more energy when the cars have the same individual speeds."
+    },
+    {
+      "id": "fd_001",
+      "category": "Fluid Dynamics",
+      "question": "Water flows through a pipe that narrows from a wide section to a narrow section. In which section is the water pressure higher, and why?",
+      "correct_answer": "Pressure is higher in the wide section. By the Bernoulli principle combined with continuity, the fluid speeds up in the narrow section, and higher velocity corresponds to lower pressure.",
+      "difficulty": "medium",
+      "explanation": "Continuity equation: A1v1 = A2v2, so narrower pipe → higher velocity. Bernoulli's equation: P + ½ρv² = constant. Higher v means lower P. This is counterintuitive but fundamental to fluid dynamics."
+    },
+    {
+      "id": "fd_002",
+      "category": "Fluid Dynamics",
+      "question": "A boat is floating in a small pond. The boat contains a large iron anchor. If you throw the anchor overboard into the pond, does the water level rise, fall, or stay the same?",
+      "correct_answer": "The water level falls. While floating, the anchor displaces water equal to its weight (a large volume for dense iron). Once sunk, it only displaces water equal to its own volume, which is much less than the weight-equivalent volume.",
+      "difficulty": "hard",
+      "explanation": "Floating displacement = weight/ρ_water. Sunken displacement = volume = weight/ρ_iron. Since ρ_iron >> ρ_water, the floating displacement is much larger. Removing the anchor from the boat and sinking it decreases total displacement, lowering the water level."
+    },
+    {
+      "id": "fd_003",
+      "category": "Fluid Dynamics",
+      "question": "A syringe is held with the needle pointing up, filled halfway with water, with a bubble of air above the water. If you push the plunger slowly, what happens to the air bubble volume?",
+      "correct_answer": "The air bubble compresses — its volume decreases. Water is essentially incompressible, but air obeys Boyle's Law: as pressure increases with plunger force, the air volume decreases proportionally (PV = constant at constant temperature).",
+      "difficulty": "medium",
+      "explanation": "Liquids are nearly incompressible; gases are highly compressible. Pushing the plunger increases pressure throughout the syringe, compressing the air. The water volume stays essentially constant while the air volume shrinks."
+    },
+    {
+      "id": "fd_004",
+      "category": "Fluid Dynamics",
+      "question": "Two identical containers are filled to the same depth: one with water, one with mercury. At the bottom of each container, which has greater pressure, and by approximately how much?",
+      "correct_answer": "The mercury container has much greater pressure at the bottom. Since mercury is about 13.6 times denser than water, the pressure at the same depth is 13.6 times greater (P = ρgh, same h, but ρ_mercury ≈ 13.6 × ρ_water).",
+      "difficulty": "easy",
+      "explanation": "Hydrostatic pressure depends only on fluid density, depth, and gravity: P = ρgh. The shape of the container and the total volume of fluid are irrelevant — only depth matters."
+    },
+    {
+      "id": "fd_005",
+      "category": "Fluid Dynamics",
+      "question": "A spinning ball moves through the air. Explain why it curves, and in which direction relative to its spin axis.",
+      "correct_answer": "The Magnus effect causes the curve. The spinning surface drags air on one side with the spin (increasing local velocity, decreasing pressure) and against the spin on the other side (decreasing velocity, increasing pressure). The ball deflects toward the low-pressure side — in the direction the top of the ball spins toward.",
+      "difficulty": "hard",
+      "explanation": "By Bernoulli's principle, increased airflow velocity on one side reduces pressure there. The pressure differential creates a net force perpendicular to the ball's trajectory. This is why topspin causes a ball to drop faster and backspin makes it float longer."
+    },
+    {
+      "id": "lt_001",
+      "category": "Levers & Torque",
+      "question": "A 2-meter seesaw is balanced at its center. A 40 kg child sits 0.5 m from the center on the left. Where must a 20 kg child sit on the right to balance it?",
+      "correct_answer": "1 meter from the center. Torque balance: 40 kg × 0.5 m = 20 kg × d, so d = 1 m. The lighter child must sit twice as far from the fulcrum.",
+      "difficulty": "easy",
+      "explanation": "For rotational equilibrium, the sum of torques about the pivot must be zero. Torque = force × perpendicular distance. With weight as force: m1 × d1 = m2 × d2."
+    },
+    {
+      "id": "lt_002",
+      "category": "Levers & Torque",
+      "question": "You can open a door easily by pushing near the edge, but it's very hard to push near the hinge. Explain using torque, and why door handles are always placed far from the hinge.",
+      "correct_answer": "Torque = force × moment arm (perpendicular distance from pivot). Pushing near the hinge gives a tiny moment arm, requiring enormous force for the same torque needed to rotate the door. Handles at the far edge maximize the moment arm, minimizing required force.",
+      "difficulty": "easy",
+      "explanation": "The door rotates about its hinge (pivot). For a given torque needed to overcome door resistance, τ = F × r, so maximizing r (distance from hinge) minimizes F. This is why even heavy doors open easily with handles placed far from hinges."
+    },
+    {
+      "id": "lt_003",
+      "category": "Levers & Torque",
+      "question": "A uniform horizontal beam of mass M and length L is attached to a wall at one end. A weight W hangs from the free end. A cable supports the beam at its midpoint at angle θ above horizontal. What is the tension in the cable?",
+      "correct_answer": "T = (WL + MgL/2) / (L/2 × sinθ) = (W + Mg/2) / (sinθ/2) = 2(W + Mg/2) / sinθ = (2W + Mg) / sinθ. Taking torques about the wall attachment: T × (L/2) × sinθ = W × L + Mg × L/2.",
+      "difficulty": "hard",
+      "explanation": "Torque balance about the wall pivot eliminates the reaction forces there. The cable's torque arm is (L/2)sinθ. The weight W acts at the full length L. The beam's own weight Mg acts at its center L/2. Solving: T = (2W + Mg) / sinθ."
+    },
+    {
+      "id": "lt_004",
+      "category": "Levers & Torque",
+      "question": "A wrench applies torque to a bolt. If you double the length of the wrench handle and apply the same force, how does the torque change? If you keep the same handle but push at 30° instead of perpendicular, what fraction of torque remains?",
+      "correct_answer": "Doubling the handle length doubles the torque (τ = F × r). Pushing at 30° to the handle (60° from perpendicular) gives τ = F × r × sin(30°) = 0.5 × original torque — only half as effective. Always push perpendicular to the handle for maximum torque.",
+      "difficulty": "medium",
+      "explanation": "Torque = F × r × sinφ where φ is the angle between force and the lever arm vector. Maximum torque occurs at φ = 90° (perpendicular). At 30° from the handle, sin(30°) = 0.5, halving the torque."
+    },
+    {
+      "id": "lt_005",
+      "category": "Levers & Torque",
+      "question": "A person stands on a scale in an elevator. The scale reads their true weight when the elevator is still. When the elevator accelerates upward, does the scale read more, less, or the same? What about during deceleration while going up?",
+      "correct_answer": "Accelerating upward: scale reads more (apparent weight = m(g + a)). Decelerating while going up (acceleration is downward): scale reads less (apparent weight = m(g − a)). The scale measures normal force, not true weight.",
+      "difficulty": "medium",
+      "explanation": "The scale measures the normal force N. Newton's second law: N − mg = ma (upward positive). N = m(g + a). When decelerating while ascending, acceleration vector points downward (a is negative), so N = m(g − |a|) < mg."
+    },
+    {
+      "id": "te_001",
+      "category": "Thermal Expansion",
+      "question": "A steel bridge has expansion joints built into it. Why? What would happen if a bridge were built without them?",
+      "correct_answer": "Steel expands when heated and contracts when cooled. Without expansion joints, seasonal and daily temperature changes would cause enormous compressive and tensile stresses, potentially buckling the bridge in summer or cracking it in winter.",
+      "difficulty": "easy",
+      "explanation": "Linear thermal expansion: ΔL = αLΔT. For a large bridge, even small temperature changes produce large absolute length changes. The joints provide space for this movement, preventing stress accumulation."
+    },
+    {
+      "id": "te_002",
+      "category": "Thermal Expansion",
+      "question": "A metal ball barely fits through a metal ring at room temperature. If you heat only the ring, does the ball fit through? If you heat only the ball, does it fit?",
+      "correct_answer": "Heating only the ring: yes, the hole gets larger (the ring expands in all dimensions, including the diameter of the hole). Heating only the ball: no, the ball expands and no longer fits through the unchanged ring.",
+      "difficulty": "medium",
+      "explanation": "A common misconception is that a heated ring's hole gets smaller as the metal 'expands inward.' In reality, all linear dimensions scale proportionally with temperature, including the hole diameter. The ring effectively scales up uniformly."
+    },
+    {
+      "id": "te_003",
+      "category": "Thermal Expansion",
+      "question": "Water is unusual among liquids in its thermal expansion behavior near 4°C. Describe this anomaly and explain one major consequence for aquatic life.",
+      "correct_answer": "Water is densest at 4°C. Above and below this temperature it is less dense. As a lake cools in winter, water at 4°C sinks to the bottom. Below 4°C, cooler water is lighter and stays near the surface, where it freezes. The ice layer insulates the water below, keeping it liquid at ~4°C and allowing fish to survive.",
+      "difficulty": "medium",
+      "explanation": "Hydrogen bonding causes water to expand as it approaches freezing. Ice is less dense than liquid water (~0.917 g/cm³ vs 1.000), so it floats. Without this anomaly, lakes would freeze from the bottom up, killing most aquatic life."
+    },
+    {
+      "id": "te_004",
+      "category": "Thermal Expansion",
+      "question": "A glass jar with a metal lid is stuck. Someone suggests running hot water over the lid. Why does this work, and why is it better to heat the lid than the glass?",
+      "correct_answer": "Metals have higher coefficients of thermal expansion than glass. Heating the metal lid causes it to expand more than the glass would, increasing the lid diameter relative to the jar neck and loosening the seal. Heating the glass would also expand the jar opening but metals expand more per degree.",
+      "difficulty": "medium",
+      "explanation": "Coefficient of thermal expansion: steel ≈ 12 × 10⁻⁶ /°C, glass ≈ 9 × 10⁻⁶ /°C. The lid expands proportionally more than glass for the same temperature change. Heating both equally would work less well than just the lid."
+    },
+    {
+      "id": "te_005",
+      "category": "Thermal Expansion",
+      "question": "A bimetallic strip is made of brass and steel bonded together. When heated, which way does it bend, and why? How does this principle appear in everyday devices?",
+      "correct_answer": "Brass has a higher thermal expansion coefficient than steel. When heated, the brass side expands more, forcing the strip to bend toward the steel side (the brass side becomes the outer, longer curve). This is used in thermostats, circuit breakers, and old-style thermometers.",
+      "difficulty": "hard",
+      "explanation": "The two metals are bonded, so they must deform together. Since brass expands more, it would be longer if free — but being bonded forces both to the same length by bending. The strip curves with the more-expanding metal on the outside of the curve."
+    },
+    {
+      "id": "com_001",
+      "category": "Center of Mass",
+      "question": "A hammer is tossed spinning through the air. Which point on the hammer follows a smooth parabolic path?",
+      "correct_answer": "The center of mass follows a smooth parabola. All other points follow complex, looping paths as the hammer rotates around its center of mass, which itself moves as a projectile under gravity.",
+      "difficulty": "medium",
+      "explanation": "For any rigid body in flight, only gravity acts (ignoring air resistance), and gravity acts uniformly on all mass. The net force acts through the center of mass, causing it alone to follow the simple projectile trajectory."
+    },
+    {
+      "id": "com_002",
+      "category": "Center of Mass",
+      "question": "A person stands at one end of a frictionless boat at rest on still water. They walk to the other end. When they stop, has the boat moved? If so, in which direction and how far?",
+      "correct_answer": "The boat moves in the opposite direction to the person's walk. The system's center of mass cannot move (no external horizontal force), so as the person walks forward, the boat drifts backward. The boat's displacement equals (person's mass / boat's mass) × (person's displacement relative to boat), in the opposite direction.",
+      "difficulty": "hard",
+      "explanation": "With no external horizontal forces, the system's center of mass stays fixed. If the person of mass m moves distance d forward, the boat of mass M moves back by md/M. The person's actual displacement over the ground is less than d: d × M/(m+M)."
+    },
+    {
+      "id": "com_003",
+      "category": "Center of Mass",
+      "question": "Can the center of mass of an object lie outside the physical material of the object? Give an example.",
+      "correct_answer": "Yes. A donut (torus), a boomerang, a horseshoe, or a hollow ring all have their center of mass at a point in empty space inside the hole. The center of mass is a mathematical weighted average position, not necessarily a material point.",
+      "difficulty": "medium",
+      "explanation": "Center of mass = Σ(m_i × r_i) / Σm_i. For symmetric objects with hollow centers, the average position falls in the void. This is physically meaningful — gravity still acts 'as if' the mass were concentrated there for external purposes."
+    },
+    {
+      "id": "com_004",
+      "category": "Center of Mass",
+      "question": "A uniform rectangular table has one leg removed. The table has four legs at its corners. At what point on the tabletop could you balance the table on a single support to keep it level?",
+      "correct_answer": "The table must be balanced at its new center of mass. With three legs removed and considering the table as a uniform surface, the center of mass is at the geometric center of the rectangle. Removing one leg doesn't move the tabletop's center of mass — it stays at the geometric center of the uniform top.",
+      "difficulty": "hard",
+      "explanation": "The tabletop is uniform, so its center of mass is at its geometric center regardless of where the legs were. The legs themselves add mass, but if the top dominates or legs are symmetric, the CoM is still central. The question tests whether students confuse the support structure with the mass distribution."
+    },
+    {
+      "id": "com_005",
+      "category": "Center of Mass",
+      "question": "A rocket in deep space (no gravity) fires its engine. Does the center of mass of the rocket-plus-exhaust system accelerate?",
+      "correct_answer": "No. The center of mass of the total system (rocket + all expelled exhaust) remains stationary or moves at constant velocity. Internal forces (the combustion) cannot change the system's total momentum. The rocket accelerates forward, but the exhaust goes backward, keeping the system CoM fixed.",
+      "difficulty": "hard",
+      "explanation": "Newton's third law: exhaust is expelled backward with the same momentum the rocket gains forward. The total system momentum is conserved. The CoM of the closed system does not accelerate. Once exhaust is considered external, the rocket's mass decreases and it accelerates — but then you've changed the system boundary."
+    },
+    {
+      "id": "fi_001",
+      "category": "Friction & Inclines",
+      "question": "A block sits on an inclined plane. As the angle of inclination increases from 0° to 90°, describe what happens to the static friction force on the block before it starts to slide.",
+      "correct_answer": "Static friction increases from zero up to its maximum value (μ_s × N). The required friction force to hold the block equals mg·sinθ, which grows with angle. Simultaneously, the normal force mg·cosθ decreases, shrinking the maximum available friction. The block slides when mg·sinθ exceeds μ_s × mg·cosθ, i.e., when tanθ > μ_s.",
+      "difficulty": "medium",
+      "explanation": "Static friction is reactive — it adjusts to exactly oppose the tendency to slide up to its maximum. As θ increases, required friction (mg sinθ) grows and maximum available friction (μ_s mg cosθ) shrinks. Sliding begins at the angle of friction: θ = arctan(μ_s)."
+    },
+    {
+      "id": "fi_002",
+      "category": "Friction & Inclines",
+      "question": "Kinetic friction is often said to be independent of sliding speed and contact area. Explain why contact area independence seems paradoxical, and what is actually happening at the microscopic level.",
+      "correct_answer": "Paradox: larger area should mean more friction. Resolution: larger area means more contact points, but also reduced pressure per point, so each asperity bonds less strongly. These effects cancel, making total friction proportional only to normal force. Microscopically, friction arises from adhesion at true contact asperities, not the apparent surface area.",
+      "difficulty": "hard",
+      "explanation": "Real surfaces are rough at microscopic scales. True contact area is a tiny fraction of apparent area and is proportional to normal force regardless of apparent size. The Bowden-Tabor adhesion model shows friction = shear strength × true contact area ∝ normal force, independent of apparent area."
+    },
+    {
+      "id": "fi_003",
+      "category": "Friction & Inclines",
+      "question": "A car brakes hard enough to lock its wheels (skidding). Is it braking more effectively or less effectively than braking just to the edge of locking? Why?",
+      "correct_answer": "Less effectively. Locked wheels create kinetic friction (lower coefficient), while wheels at the threshold of locking use static friction (higher coefficient). Anti-lock braking systems (ABS) exploit this by keeping wheels near but not at the locking point, maximizing braking force.",
+      "difficulty": "medium",
+      "explanation": "For most surfaces, μ_static > μ_kinetic. Maximum braking force = μN. Rolling-to-threshold uses μ_static; full lock-up uses μ_kinetic. The difference can be 20-30% for rubber on dry pavement. Additionally, locked wheels compromise steering control."
+    },
+    {
+      "id": "fi_004",
+      "category": "Friction & Inclines",
+      "question": "Two identical blocks are stacked on each other on a frictionless table. A horizontal force is applied to the bottom block. What determines whether the blocks move together or slide over each other?",
+      "correct_answer": "The friction between the two blocks determines this. If the applied force divided by the total mass (the required acceleration) times the top block's mass exceeds the maximum static friction between the blocks, they slide. Otherwise they move together. The top block can only accelerate via friction from the bottom block.",
+      "difficulty": "medium",
+      "explanation": "The only horizontal force on the top block is friction from the bottom block. The maximum acceleration transmissible to the top block is a_max = μ_s × g (from f = μ_s × m_top × g = m_top × a_max). If the applied force requires greater acceleration than this, the blocks slip."
+    },
+    {
+      "id": "fi_005",
+      "category": "Friction & Inclines",
+      "question": "A block is pushed against a vertical wall with a horizontal force. What is the minimum horizontal force needed to prevent the block from sliding down?",
+      "correct_answer": "The minimum force F satisfies μ_s × F ≥ mg, so F ≥ mg / μ_s. The normal force on the wall equals the horizontal push F, and friction (vertical, upward) equals μ_s × F. This must support the block's weight mg.",
+      "difficulty": "medium",
+      "explanation": "Normal force N = F (horizontal push). Friction force (upward) = μ_s × N = μ_s × F. For equilibrium: μ_s × F = mg → F = mg/μ_s. Heavier blocks or lower friction coefficients require larger pushing forces to prevent sliding."
+    },
+    {
+      "id": "bu_001",
+      "category": "Buoyancy",
+      "question": "A ship made of steel floats, but a solid steel ball sinks. Explain how the ship floats despite being made of the same material.",
+      "correct_answer": "The ship is hollow — its total volume (including air inside) is much larger than a solid steel object of the same mass. This larger volume displaces more water. When the weight of water displaced equals the ship's total weight, it floats. Average density of ship + enclosed air is less than water.",
+      "difficulty": "easy",
+      "explanation": "Archimedes' principle: buoyant force = weight of fluid displaced = ρ_water × V_submerged × g. For flotation: buoyant force ≥ weight. The ship achieves this by having a large V_submerged (volume of the hull below waterline) relative to its mass."
+    },
+    {
+      "id": "bu_002",
+      "category": "Buoyancy",
+      "question": "A fish bladder (swim bladder) allows fish to remain neutrally buoyant at various depths. However, if a fish is quickly moved to a much greater depth, what happens and why?",
+      "correct_answer": "At greater depth, water pressure is higher and compresses the swim bladder, reducing its volume. The fish becomes denser than water and tends to sink further. The fish must actively add gas to its bladder to restore neutral buoyancy. Deep-sea fish brought rapidly to the surface suffer the opposite — the bladder expands, sometimes protruding from the mouth.",
+      "difficulty": "medium",
+      "explanation": "Swim bladder volume follows Boyle's Law (approximately). Pressure increases with depth (P = P_atm + ρgh). The bladder compresses, reducing buoyant volume. This makes depth regulation via passive gas bladder a slow biological process requiring metabolic gas secretion."
+    },
+    {
+      "id": "bu_003",
+      "category": "Buoyancy",
+      "question": "You place a sealed empty bottle (air inside) in water and push it fully submerged. Compare the buoyant force when it is 0.5 m deep versus 5 m deep.",
+      "correct_answer": "Approximately the same, but slightly less at 5 m. The buoyant force equals the weight of water displaced = ρ_water × V × g. At greater depth, higher pressure compresses the air inside slightly, reducing the bottle's volume and thus displacing less water. The bottle's rigid walls resist this, so for a rigid bottle the effect is negligible; for a flexible container it would be more significant.",
+      "difficulty": "hard",
+      "explanation": "Buoyant force depends on the volume of displaced water. For a rigid sealed bottle, depth doesn't change volume, so buoyant force is constant. For a flexible container (like a plastic bag), increased pressure at depth compresses the air, shrinking the volume and reducing buoyancy — which is why diving bladders need pressure-regulated valves."
+    },
+    {
+      "id": "bu_004",
+      "category": "Buoyancy",
+      "question": "A helium balloon is inside a sealed car. The car accelerates forward. Which direction does the balloon move relative to the car — forward, backward, or does it stay put?",
+      "correct_answer": "The balloon moves forward (toward the front of the car). In the non-inertial frame of the accelerating car, there is an apparent rearward force on all objects. Air (denser) is pushed backward, creating a pressure gradient — higher pressure at the rear, lower at the front. The buoyant force pushes the lighter-than-air balloon toward the lower-pressure region — forward.",
+      "difficulty": "hard",
+      "explanation": "This is the buoyancy-in-acceleration analog of buoyancy in gravity. Effective gravity points backward in the car's frame. Dense air sinks 'backward' creating a pressure gradient. The helium balloon, being less dense than air, rises opposite to effective gravity — forward. This is counterintuitive to most people."
+    },
+    {
+      "id": "bu_005",
+      "category": "Buoyancy",
+      "question": "A block of wood floats in water with 70% of its volume submerged. What is the wood's density relative to water?",
+      "correct_answer": "The wood's density is 70% of water's density, or 0.70 g/cm³ (700 kg/m³). At equilibrium, the weight of water displaced equals the weight of the wood: ρ_water × 0.7V × g = ρ_wood × V × g, so ρ_wood = 0.7 × ρ_water.",
+      "difficulty": "easy",
+      "explanation": "For a floating object, the fraction submerged equals the ratio of object density to fluid density. This is a direct consequence of Archimedes' principle: buoyant force = weight → ρ_fluid × V_sub = ρ_object × V_total → V_sub/V_total = ρ_object/ρ_fluid."
+    }
+  ]
+}
